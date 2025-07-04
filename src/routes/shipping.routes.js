@@ -52,7 +52,7 @@ router.post('/generate-pickup', verifyJwt, asyncHandler(async (req, res) => {
 }))
 
 // Track shipment
-router.get('/track/:orderId', verifyJwt, asyncHandler(async (req, res) => {
+router.get('/track', verifyJwt, asyncHandler(async (req, res) => {
     const { orderId } = req.params
 
     if (!orderId) throw new ApiError(400, "Order ID is required")
