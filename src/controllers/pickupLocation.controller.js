@@ -16,13 +16,14 @@ import {
 
 // Create pickup location (Admin only)
 const createPickupLoc = asyncHandler(async (req, res) => {
-    const { location_name, address, city, state, pincode, phone, is_default } = req.body
+    const { location_name, address, city, state, pincode, contact_person, phone, is_default } = req.body
 
     if (!location_name?.trim()) throw new ApiError(400, "Location name is required")
     if (!address?.trim()) throw new ApiError(400, "Address is required")
     if (!city?.trim()) throw new ApiError(400, "City is required")
     if (!state?.trim()) throw new ApiError(400, "State is required")
     if (!pincode?.trim()) throw new ApiError(400, "Pincode is required")
+    if (!contact_person?.trim()) throw new ApiError(400, "Contact Person is required")
 
     const locationData = {
         location_name: location_name.trim(),
@@ -30,6 +31,7 @@ const createPickupLoc = asyncHandler(async (req, res) => {
         city: city.trim(),
         state: state.trim(),
         pincode: pincode.trim(),
+        contact_person:contact_person.trim(),
         phone: phone?.trim() || null,
         is_default: is_default || false
     }
@@ -74,7 +76,7 @@ const getDefaultPickupLoc = asyncHandler(async (req, res) => {
 // Update pickup location (Admin only)
 const updatePickupLoc = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const { location_name, address, city, state, pincode, phone, is_default } = req.body
+    const { location_name, address, city, state, pincode, phone,contact_person, is_default } = req.body
 
     if (!id) throw new ApiError(400, "Location ID is required")
 
@@ -88,6 +90,7 @@ const updatePickupLoc = asyncHandler(async (req, res) => {
     if (state?.trim()) updateData.state = state.trim()
     if (pincode?.trim()) updateData.pincode = pincode.trim()
     if (phone?.trim()) updateData.phone = phone.trim()
+    if (contact_person?.trim()) updateData.contact_person = contact_person.trim()
     if (typeof is_default === 'boolean') updateData.is_default = is_default
 
     if (Object.keys(updateData).length === 0) {

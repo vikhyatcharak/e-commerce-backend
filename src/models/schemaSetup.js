@@ -172,10 +172,14 @@ export const initializeTables = async () => {
         address TEXT NOT NULL,
         city VARCHAR(100) NOT NULL,
         state VARCHAR(100) NOT NULL,
+        country VARCHAR(100) NOT NULL,
         pincode VARCHAR(10) NOT NULL,
+        contact_person VARCHAR(100) NOT NULL,
         phone VARCHAR(20),
         is_default BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
       )
     `)
 
