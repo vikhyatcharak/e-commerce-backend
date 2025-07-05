@@ -1,7 +1,7 @@
 import axios from 'axios'
 import shiprocketAuth from './shiprocketAuth.js'
 import { getDefaultPickupLocation } from '../models/pickupLocations.model.js'
-import updateOrderShippingDetails from '../models/orders.model.js'
+import {updateOrderShippingDetails} from '../models/orders.model.js'
 
 class ShiprocketService {
     constructor() {

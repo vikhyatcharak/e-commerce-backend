@@ -113,6 +113,4 @@ export {
     getOrdrById,
     getOrdrByUserId,
     updatePaymentStatus,
-    updateDeliveryStatus,
-    createReturnOrdr
-}
+    updateDeliveryStatus}

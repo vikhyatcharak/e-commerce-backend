@@ -10,7 +10,7 @@ export const createPickupLocation = async ({ location_name, address, city, state
     const [result] = await db().query(`
         INSERT INTO pickup_locations (location_name, address, city, state, country, pincode,contact_person, phone, is_default) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [location_name, address, city, state, country, pincode, contact_person, phone, is_default]
+        [location_name, address, city, state, country, pincode, contact_person, phone, is_default?1:0]
     )
     return result.insertId
 }

@@ -139,8 +139,8 @@ export const initializeTables = async () => {
         final_total DECIMAL(10,2),
         coupon_id INT,
         payment_mode VARCHAR(50),
-        payment_status,
-        delivery_status,
+        payment_status VARCHAR(50),
+        delivery_status VARCHAR(50),
         shiprocket_order_id VARCHAR(100),
         shipment_id VARCHAR(100),
         awb_code VARCHAR(100),
@@ -177,8 +177,8 @@ export const initializeTables = async () => {
         contact_person VARCHAR(100) NOT NULL,
         phone VARCHAR(20),
         is_default BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 
       )
     `)
