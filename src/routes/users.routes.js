@@ -6,7 +6,8 @@ import { getAllUsr, getUsr } from "../controllers/users.controller.js"
 const router=Router()
 
 router.get('/',verifyJwt,getAllUsr)
-router.route("/:id/orders").get(verifyJwt,getOrdrByUserId)
-router.get('/:id',verifyJwt,getUsr)
+router.post('/lookup',verifyJwt,getUsr)
+router.get('/lookup/:id',verifyJwt,getUsr)
+router.route("/:user_id/orders").get(verifyJwt,getOrdrByUserId)
 
 export default router

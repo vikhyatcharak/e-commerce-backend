@@ -51,7 +51,6 @@ router.post("/auth/send-otp", sendCustomerOtp)
 router.post("/auth/verify-otp", verifyCustomerOtp)
 router.post("/auth/register", registerCustomer)
 router.post("/auth/login", loginCustomer)
-router.post("/auth/refresh-token", refreshAccessToken)
 
 // Protected routes (authentication required)
 router.use(verifyCustomerJwt) // Apply middleware to all routes below
@@ -61,6 +60,7 @@ router.get("/profile", getCurrentCustomer)
 router.patch("/profile", updateCustomerProfile)
 router.post("/auth/logout", logoutCustomer)
 router.post("/auth/change-password", changePassword)
+router.post("/auth/refresh-token", refreshAccessToken)
 
 // Address routes
 router.route("/addresses")

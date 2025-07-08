@@ -168,7 +168,7 @@ export const initializeTables = async () => {
     await db().query(`
       CREATE TABLE IF NOT EXISTS pickup_locations (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        location_name VARCHAR(300) NOT NULL,
+        location_name VARCHAR(300) UNIQUE NOT NULL,
         address TEXT NOT NULL,
         city VARCHAR(100) NOT NULL,
         state VARCHAR(100) NOT NULL,
@@ -176,6 +176,7 @@ export const initializeTables = async () => {
         pincode VARCHAR(10) NOT NULL,
         contact_person VARCHAR(100) NOT NULL,
         phone VARCHAR(20),
+        email VARCHAR(500),
         is_default BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

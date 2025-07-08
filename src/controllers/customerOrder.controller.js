@@ -5,7 +5,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { createOrder, getOrderById, getOrdersByUserId } from "../models/orders.model.js"
 import { addOrderItem } from "../models/orderItems.model.js"
 import { getCartByUserId, clearCart, validateCartStock } from "../models/cart.model.js"
-import { getDefaultAddress } from "../models/customerAddress.model.js"
+import { getDefaultAddress, getAddressById } from "../models/customerAddress.model.js"
 import shiprocketService from '../services/shiprocketService.js'
 import { updateOrderShippingDetails } from "../models/orders.model.js"
 
@@ -14,8 +14,7 @@ const createCustomerOrder = asyncHandler(async (req, res) => {
     const {
         address_id,
         payment_mode = 'cod',
-        coupon_id,
-        shipping_preferences
+        coupon_id
     } = req.body
     const user_id = req.customer.id
 
@@ -53,7 +52,7 @@ const createCustomerOrder = asyncHandler(async (req, res) => {
     cartItems.forEach(item => {
         const itemTotal = item.quantity * item.price
         subtotal += itemTotal
-        totalWeight += (item.weight || 0.5) * item.quantity // Default 0.5kg per item
+        totalWeight += (item.weight || 1) * item.quantity // Default 1kg per item
 
         orderItems.push({
             name: item.product_name + (item.variant_name ? ` - ${item.variant_name}` : ''),
@@ -75,6 +74,7 @@ const createCustomerOrder = asyncHandler(async (req, res) => {
     // Create order in database
     const orderData = {
         user_id,
+        customer_address_id:shippingAddress.id,
         total: subtotal,
         tax,
         discount,
@@ -97,58 +97,13 @@ const createCustomerOrder = asyncHandler(async (req, res) => {
             price: cartItem.price * cartItem.quantity
         })
     }
+    // Clear cart after successful order
+    await clearCart(user_id)
+    const newOrder = await getOrderById(orderId)
 
-    // Create Shiprocket order
-    try {
-        const shiprocketOrderData = {
-            orderId,
-            orderDate: new Date().toISOString(),
-            pickupLocation: shipping_preferences?.pickup_location || 'Default Location',
-            customerName: req.customer.name.split(' ')[0] || 'Customer',
-            customerLastName: req.customer.name.split(' ').slice(1).join(' ') || '',
-            billingAddress: shippingAddress.address,
-            billingCity: shippingAddress.city,
-            billingPincode: shippingAddress.pincode,
-            billingState: shippingAddress.state,
-            billingCountry: shippingAddress.country,
-            email: req.customer.email || '',
-            phone: req.customer.phone,
-            items: orderItems,
-            paymentMethod: payment_mode === 'cod' ? 'COD' : 'Prepaid',
-            subTotal: subtotal,
-            weight: totalWeight
-        }
-
-        const shiprocketOrder = await shiprocketService.createOrder(shiprocketOrderData)
-
-        // Update order with Shiprocket details
-        await updateOrderShippingDetails(orderId, {
-            shiprocket_order_id: shiprocketOrder.shiprocketOrderId,
-            shipment_id: shiprocketOrder.shipmentId
-        })
-
-        // Clear cart after successful order
-        await clearCart(user_id)
-
-        const newOrder = await getOrderById(orderId)
-
-        return res.status(201).json(new ApiResponse(201, {
-            order: newOrder,
-            shiprocket: {
-                orderId: shiprocketOrder.shiprocketOrderId,
-                shipmentId: shiprocketOrder.shipmentId
-            }
-        }, "Order created successfully"))
-
-    } catch (shiprocketError) {
-        console.error("Shiprocket error:", shiprocketError)
-        // Order created but shipping failed - still return success
-        const newOrder = await getOrderById(orderId)
-        return res.status(201).json(new ApiResponse(201, {
-            order: newOrder,
-            warning: "Order created but shipping setup failed. Contact support."
-        }, "Order created with shipping issues"))
-    }
+    return res.status(201).json(new ApiResponse(201, {
+        order: newOrder,
+    }, "Order created successfully"))
 })
 
 // Get customer's orders
@@ -260,9 +215,6 @@ const cancelCustomerOrder = asyncHandler(async (req, res) => {
         if (order.shiprocket_order_id) {
             await shiprocketService.cancelShipment(order.shiprocket_order_id)
         }
-
-        // Update order status
-        await updateOrderDeliveryStatus(id, { delivery_status: 'cancelled' })
 
         const updatedOrder = await getOrderById(id)
 

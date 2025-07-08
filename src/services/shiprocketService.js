@@ -1,7 +1,7 @@
 import axios from 'axios'
 import shiprocketAuth from './shiprocketAuth.js'
 import { getDefaultPickupLocation } from '../models/pickupLocations.model.js'
-import {updateOrderShippingDetails} from '../models/orders.model.js'
+import { updateOrderShippingDetails } from '../models/orders.model.js'
 
 class ShiprocketService {
     constructor() {
@@ -27,13 +27,13 @@ class ShiprocketService {
                     config.data = data
                 }
             }
-
+            console.log(config)
             const response = await axios(config)
             return response.data
         } catch (error) {
             // Check if error is due to authentication
             if (this.isAuthError(error) && retryCount < this.maxRetries) {
-                console.log(`Auth error detected, refreshing token and retrying (attempt ${retryCount + 1})`)
+                console.log(`${error} error detected, refreshing token and retrying (attempt ${retryCount + 1})`)
 
                 try {
                     // Force token refresh
@@ -273,7 +273,7 @@ class ShiprocketService {
         }
     }
 
-    async generateReturnOrder(orderId, returnOrderData, reason) {
+    async generateReturnOrder(orderId, returnData, reason) {
         try {
             const returnOrder = {
                 order_id: returnData.orderId,
@@ -316,7 +316,7 @@ class ShiprocketService {
 
             const response = await this.makeRequest('post', 'orders/create/return', returnOrder)
 
-            await updateOrderShippingDetails(orderId, {return_shipment_id: response.returnShipmentId,return_order_id: response.returnOrderId,return_reason: reason})
+            await updateOrderShippingDetails(orderId, { return_shipment_id: response.returnShipmentId, return_order_id: response.returnOrderId, return_reason: reason })
             return {
                 success: true,
                 returnOrderId: response.order_id,
@@ -327,6 +327,78 @@ class ShiprocketService {
             throw new Error(`Return order creation failed: ${error.response?.data?.message || error.message}`)
         }
     }
+
+    async createPickupLocation(pickupLocationData) {
+        try {
+            const payload = {
+                pickup_location: pickupLocationData.location_name,
+                name: pickupLocationData.contact_person,
+                email: pickupLocationData.email,
+                phone: pickupLocationData.phone,
+                address: pickupLocationData.address,
+                address_2: pickupLocationData.address2 || '',
+                city: pickupLocationData.city,
+                state: pickupLocationData.state,
+                country: pickupLocationData.country || 'India',
+                pin_code: pickupLocationData.pincode
+            }
+
+            const response = await this.makeRequest('post', 'settings/company/addpickup', payload)
+
+            return {
+                success: true,
+                message: response.message || 'Pickup location created successfully',
+                data: response
+            }
+        } catch (error) {
+            throw new Error(`Pickup location creation failed: ${error.response?.data?.message || error.message}`)
+        }
+    }
+
+    async deletePickupLocation(locationName) {
+        try {
+            const response = await this.makeRequest('post', 'settings/company/removepickup', {
+                pickup_location: locationName
+            })
+
+            return {
+                success: true,
+                message: response.message || 'Pickup location deleted successfully',
+                data: response
+            }
+        } catch (error) {
+            throw new Error(`Pickup location deletion failed: ${error.response?.data?.message || error.message}`)
+        }
+    }
+
+    async updatePickupLocation(locationName, updatedData) {
+        try {
+            const payload = {
+                pickup_location: locationName,
+                name: updatedData.contact_person,
+                email: updatedData.email,
+                phone: updatedData.phone,
+                address: updatedData.address,
+                address_2: updatedData.address2 || '',
+                city: updatedData.city,
+                state: updatedData.state,
+                country: updatedData.country || 'India',
+                pin_code: updatedData.pincode
+            }
+
+            const response = await this.makeRequest('post', 'settings/company/updatepickup', payload)
+
+            return {
+                success: true,
+                message: response.message || 'Pickup location updated successfully',
+                data: response
+            }
+        } catch (error) {
+            throw new Error(`Pickup location update failed: ${error.response?.data?.message || error.message}`)
+        }
+    }
+
+
 
 }
 

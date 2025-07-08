@@ -9,7 +9,7 @@ export const createAddress = async ({ user_id, address, city, state, pincode, co
     const [result] = await db().query(`
         INSERT INTO customer_addresses (user_id, address, city, state, pincode, country, is_default) 
         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [user_id, address, city, state, pincode, country, is_default]
+        [user_id, address, city, state, pincode, country, is_default?1:0]
     )
     return result.insertId
 }

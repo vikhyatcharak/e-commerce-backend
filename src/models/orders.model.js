@@ -2,8 +2,7 @@ import { db } from '../db/index.js'
 export const createOrder = async ({ user_id, customer_address_id, total, tax, discount, final_total, coupon_id, payment_mode, payment_status, delivery_status
 }) => {
   const [result] = await db().query(
-    `INSERT INTO orders (user_id, customer_address_id, total, tax, discount, final_total, coupon_id, payment_mode, payment_status, delivery_status)
-    //  VALUES (?, , ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO orders (user_id, customer_address_id, total, tax, discount, final_total, coupon_id, payment_mode, payment_status, delivery_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [user_id, customer_address_id, total, tax, discount, final_total, coupon_id, payment_mode, payment_status, delivery_status]
   )
   return result.insertId
@@ -37,7 +36,7 @@ export async function updateOrderShippingDetails(orderId, shippingData) {
   let fields = []
   let params = []
 
-  for (const [key, value] of Object.entries(updateData)) {
+  for (const [key, value] of Object.entries(shippingData)) {
     fields.push(`${key} = ?`)
     params.push(value)
   }

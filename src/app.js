@@ -42,7 +42,7 @@ app.use("/api/admin/productVariants", productVariantsRouter)
 app.use("/api/admin/coupons", couponsRouter)
 app.use("/api/admin/orders", ordersRouter)
 app.use("/api/admin/emailTemplates", emailTemplateRouter)
-app.use("/api/admin/shipping", shippingRouter)
+app.use("/api/admin/shiprocket", shippingRouter)
 app.use("/api/admin/pickup-locations", pickupLocationRouter)
 
 //customer routes

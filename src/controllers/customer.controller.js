@@ -71,7 +71,7 @@ const verifyCustomerOtp = asyncHandler(async (req, res) => {
             name: name.trim(),
             email: email?.trim() || null,
             phone: phone.trim(),
-            is_guest: false
+            is_guest: true
         }
 
         const userId = await createUser(userData)
@@ -151,7 +151,6 @@ const loginCustomer = asyncHandler(async (req, res) => {
 
     if (!(email || phone)) throw new ApiError(400, "Email or phone is required")
     if (!password) throw new ApiError(400, "Password is required")
-
     let user
     if (email) {
         user = await getUserByEmail(email.trim())
@@ -232,13 +231,15 @@ const getCurrentCustomer = asyncHandler(async (req, res) => {
 
 // Update customer profile
 const updateCustomerProfile = asyncHandler(async (req, res) => {
-    const { name, email, dob, gender } = req.body
+    const { name, email, dob, gender, phone } = req.body
 
     const updateData = {}
     if (name?.trim()) updateData.name = name.trim()
     if (email?.trim()) updateData.email = email.trim()
     if (dob) updateData.dob = dob
     if (gender) updateData.gender = gender
+    if (phone) updateData.phone = phone
+    if(gender && dob && req.customer.is_guest) updateData.is_guest=0
 
     if (Object.keys(updateData).length === 0) {
         throw new ApiError(400, "No update data provided")

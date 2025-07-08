@@ -84,7 +84,7 @@ const updateCustomerAddress = asyncHandler(async (req, res) => {
     if (state?.trim()) updateData.state = state.trim()
     if (pincode?.trim()) updateData.pincode = pincode.trim()
     if (country?.trim()) updateData.country = country.trim()
-    if (typeof is_default === 'boolean') updateData.is_default = is_default
+    if (typeof is_default === 'boolean') updateData.is_default = is_default?1:0
 
     if (Object.keys(updateData).length === 1) { // Only user_id
         throw new ApiError(400, "No update data provided")

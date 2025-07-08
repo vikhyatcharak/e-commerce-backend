@@ -15,6 +15,6 @@ router.route('/customer-address').get(verifyJwt,getCustomerAddressById)
 
 router.route("/:id").get(verifyJwt,getOrdrById)
 
-router.route("/:id/items").get(verifyJwt,getOrderItm)
+router.route("/:order_id/items").get(verifyJwt,getOrderItm)
 
 export default router

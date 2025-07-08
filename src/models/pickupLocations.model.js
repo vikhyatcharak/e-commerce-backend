@@ -1,16 +1,16 @@
 // src/models/pickupLocations.model.js
 import { db } from '../db/index.js'
 
-export const createPickupLocation = async ({ location_name, address, city, state,country, pincode,contact_person, phone, is_default = false }) => {
+export const createPickupLocation = async ({ location_name, address, city, state,country, pincode,contact_person, phone, email, is_default = false }) => {
     // If this is set as default, unset all other pickup locations
     if (is_default) {
         await db().query('UPDATE pickup_locations SET is_default = FALSE')
     }
     
     const [result] = await db().query(`
-        INSERT INTO pickup_locations (location_name, address, city, state, country, pincode,contact_person, phone, is_default) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [location_name, address, city, state, country, pincode, contact_person, phone, is_default?1:0]
+        INSERT INTO pickup_locations (location_name, address, city, state, country, pincode,contact_person, phone, email, is_default) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [location_name, address, city, state, country, pincode, contact_person, phone, email, is_default?1:0]
     )
     return result.insertId
 }

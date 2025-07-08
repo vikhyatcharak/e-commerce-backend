@@ -9,11 +9,11 @@ const router = express.Router()
 
 // Calculate shipping rates
 router.post('/calculate-rates', asyncHandler(async (req, res) => {
-    const { pickupPostcode, deliveryPostcode, weight, cod, declaredValue } = req.body
+    const { pickup_postcode, delivery_postcode, weight, cod, declared_value } = req.body
 
-    if (!pickupPostcode || !deliveryPostcode || !weight) throw new ApiError(400, "Pickup postcode, delivery postcode, and weight are required")
+    if (!pickup_postcode || !delivery_postcode || !weight) throw new ApiError(400, "Pickup postcode, delivery postcode, and weight are required")
 
-    const result = await shiprocketService.calculateShippingRate({ pickupPostcode, deliveryPostcode, weight, cod: cod || 0, declaredValue: declaredValue || 0 })
+    const result = await shiprocketService.calculateShippingRate({ pickupPostcode:pickup_postcode, deliveryPostcode:delivery_postcode, weight, cod: cod || 0, declaredValue: declared_value || 0 })
 
     res.status(200).json(new ApiResponse(200, result, "Shipping rates calculated successfully"))
 }))

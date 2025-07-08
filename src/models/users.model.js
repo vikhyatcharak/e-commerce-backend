@@ -1,9 +1,9 @@
 import { db } from '../db/index.js'
 
-export const createUser = async ({name, email, phone, address, dob, gender, is_guest = true }) => {
+export const createUser = async ({name, email, phone, password, dob, gender, is_guest = true }) => {
     const [result] = await db().query(`
-        INSERT INTO users (name, email, phone, address, dob, gender, is_guest) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [name, email, phone, address, dob, gender, is_guest]
+        INSERT INTO users (name, email, phone, password, dob, gender, is_guest) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [name, email, phone, password, dob, gender, is_guest?1:0]
     )
     return result.insertId
 }

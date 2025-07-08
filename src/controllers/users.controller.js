@@ -1,12 +1,12 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
-import { createUser,getUserById,getUserByEmail,getUserByPhone,updateUser,deleteUser,getAllUsers} from "../models/users.model.js"
+import { createUser, getUserById, getUserByEmail, getUserByPhone, updateUser, deleteUser, getAllUsers } from "../models/users.model.js"
 
 const createUsr = asyncHandler(async (req, res) => {
-    const { name,email,phone,address,dob,gender} = req.body
+    const { name, email, phone, address, dob, gender } = req.body
 
-    const {is_guest}=req.params//use as guest or register/signIn
+    const { is_guest } = req.params//use as guest or register/signIn
 
     if (!name?.trim()) throw new ApiError(400, "Name is required")
     if (!email?.trim()) throw new ApiError(400, "Email is required")
@@ -34,39 +34,44 @@ const createUsr = asyncHandler(async (req, res) => {
 
     const newUser = await getUserById(userId)
     return res.status(200)
-    .json(new ApiResponse(200, newUser, "User created successfully"))
+        .json(new ApiResponse(200, newUser, "User created successfully"))
 })
 
 const getUsr = asyncHandler(async (req, res) => {
-    const { id, email, phone } = req.body
-
     let user
-    if (id) {
-        const userId = Number(id)
-        if (!userId) throw new ApiError(400, "Invalid user ID")
-        user = await getUserById(userId)
-    } else if (email) {
-        if(!email?.trim()) throw new ApiError(400,"Invalid email")
-        user = await getUserByEmail(email?.trim())
+    if(req.params){
+        const { id } = req.params
+        if(id) {
+                const userId = Number(id)
+                if (!userId) throw new ApiError(400, "Invalid user ID")
+                user = await getUserById(userId)
+            }
+    }else if (req.body) {
+        const { email, phone } = req.body
+        if (email) {
+            if (!email?.trim()) throw new ApiError(400, "Invalid email")
+            user = await getUserByEmail(email?.trim())
+        } else if (phone) {
+            if (!phone?.trim()) throw new ApiError(400, "Invalid phone")
+            user = await getUserByPhone(phone)
+        }
     } else {
-        if(!phone?.trim()) throw new ApiError(400,"Invalid phone")
-        user = await getUserByPhone(phone)
+        throw new ApiError(400,"email or phone is required")
     }
-
     if (!user) throw new ApiError(404, "User not found")
     return res.status(200)
-    .json(new ApiResponse(200, user, "User retrieved successfully"))
+        .json(new ApiResponse(200, user, "User retrieved successfully"))
 })
 
 const getAllUsr = asyncHandler(async (req, res) => {
     const users = await getAllUsers()
     return res.status(200)
-    .json(new ApiResponse(200, users, "All users retrieved successfully"))
+        .json(new ApiResponse(200, users, "All users retrieved successfully"))
 })
 
 const updateUsr = asyncHandler(async (req, res) => {
     const { id: rawId, ...updateData } = req.body
-    
+
     if (!rawId) throw new ApiError(400, "User ID is required")
     const userId = Number(rawId)
     if (!userId) throw new ApiError(400, "Invalid user ID")
@@ -90,16 +95,16 @@ const updateUsr = asyncHandler(async (req, res) => {
     })
 
     if (!affectedRows) throw new ApiError(404, "User not found or no changes made")
-    
+
     const updatedUser = await getUserById(userId)
     return res.status(200)
-    .json(new ApiResponse(200, updatedUser, "User updated successfully"))
+        .json(new ApiResponse(200, updatedUser, "User updated successfully"))
 })
 
 const deleteUsr = asyncHandler(async (req, res) => {
     const { id: rawId } = req.query
     if (!rawId) throw new ApiError(400, "User ID is required")
-    
+
     const userId = Number(rawId)
     if (!userId) throw new ApiError(400, "Invalid user ID")
 
