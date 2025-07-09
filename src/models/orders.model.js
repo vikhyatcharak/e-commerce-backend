@@ -9,7 +9,7 @@ export const createOrder = async ({ user_id, customer_address_id, total, tax, di
 }
 
 export const getAllOrders = async () => {
-  const [rows] = await db().query(`SELECT * FROM orders ORDER BY created_at DESC`)
+  const [rows] = await db().query(`SELECT * FROM orders WHERE delivery_status!= 'cancelled'  ORDER BY created_at DESC`)
   return rows
 }
 export const getOrderById = async (id) => {

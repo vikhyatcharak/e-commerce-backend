@@ -11,9 +11,9 @@ const router = express.Router()
 router.post('/calculate-rates', asyncHandler(async (req, res) => {
     const { pickup_postcode, delivery_postcode, weight, cod, declared_value } = req.body
 
-    if (!pickup_postcode || !delivery_postcode || !weight) throw new ApiError(400, "Pickup postcode, delivery postcode, and weight are required")
+    if (!pickup_postcode || !delivery_postcode || !weight || declared_value === undefined || cod === undefined) throw new ApiError(400, "All fields (pickup_postcode, delivery_postcode, weight, cod, declared_value) are required")
 
-    const result = await shiprocketService.calculateShippingRate({ pickupPostcode:pickup_postcode, deliveryPostcode:delivery_postcode, weight, cod: cod || 0, declaredValue: declared_value || 0 })
+    const result = await shiprocketService.calculateShippingRate({ pickupPostcode: pickup_postcode, deliveryPostcode: delivery_postcode, weight, cod: cod || 0, declaredValue: declared_value || 0 })
 
     res.status(200).json(new ApiResponse(200, result, "Shipping rates calculated successfully"))
 }))
@@ -23,7 +23,7 @@ router.post('/create-order', verifyJwt, asyncHandler(async (req, res) => {
     const orderData = req.body
 
     if (!orderData.orderId || !orderData.customerName || !orderData.items) throw new ApiError(400, "Order ID, customer name, and items are required")
-
+    if (typeof orderData.items === 'string') orderData.items = JSON.parse(orderData.items)
     const result = await shiprocketService.createOrder(orderData)
 
     res.status(201).json(new ApiResponse(201, result, "Shipping order created successfully"))
@@ -31,8 +31,8 @@ router.post('/create-order', verifyJwt, asyncHandler(async (req, res) => {
 
 // Assign courier
 router.post('/assign-courier', verifyJwt, asyncHandler(async (req, res) => {
-    const { orderData } = req.body
-
+    const orderData = req.body
+    console.log(orderData)
     if (!orderData.shipmentId || !orderData.courierId) throw new ApiError(400, "Shipment ID and courier ID are required")
 
     const result = await shiprocketService.assignCourier(orderData)
@@ -42,7 +42,7 @@ router.post('/assign-courier', verifyJwt, asyncHandler(async (req, res) => {
 
 // Generate pickup
 router.post('/generate-pickup', verifyJwt, asyncHandler(async (req, res) => {
-    const { shipmentId } = req.body
+    const {shipmentId} = req.body
 
     if (!shipmentId) throw new ApiError(400, "Shipment ID is required")
 
@@ -53,7 +53,7 @@ router.post('/generate-pickup', verifyJwt, asyncHandler(async (req, res) => {
 
 // Track shipment
 router.get('/track', verifyJwt, asyncHandler(async (req, res) => {
-    const { orderId } = req.params
+    const { orderId } = req.query
 
     if (!orderId) throw new ApiError(400, "Order ID is required")
 
@@ -75,39 +75,39 @@ router.post('/cancel-shipment', verifyJwt, asyncHandler(async (req, res) => {
 
 // Generate manifest
 router.post('/manifest', verifyJwt, asyncHandler(async (req, res) => {
-    const { shipmentIds,orderId } = req.body
+    const { shipmentIds, orderId } = req.body
 
     if (!shipmentIds || (Array.isArray(shipmentIds) && shipmentIds.length === 0)) {
         throw new ApiError(400, "Shipment IDs are required")
     }
 
-    const result = await shiprocketService.generateManifest(shipmentIds,orderId)
+    const result = await shiprocketService.generateManifest(shipmentIds, orderId)
 
     res.status(200).json(new ApiResponse(200, result, "Manifest generated successfully"))
 }))
 
 // Download shipping labels
 router.post('/label', verifyJwt, asyncHandler(async (req, res) => {
-    const { orderIds,orderId } = req.body
+    const { orderIds, orderId } = req.body
 
     if (!orderIds || (Array.isArray(orderIds) && orderIds.length === 0)) {
         throw new ApiError(400, "Order IDs are required")
     }
 
-    const result = await shiprocketService.downloadLabel(orderIds,orderId)
+    const result = await shiprocketService.downloadLabel(orderIds, orderId)
 
     res.status(200).json(new ApiResponse(200, result, "Labels generated successfully"))
 }))
 
 // Download invoices
 router.post('/invoice', verifyJwt, asyncHandler(async (req, res) => {
-    const { orderIds,orderId } = req.body
+    const { orderIds, orderId } = req.body
 
     if (!orderIds || (Array.isArray(orderIds) && orderIds.length === 0)) {
         throw new ApiError(400, "Order IDs are required")
     }
 
-    const result = await shiprocketService.downloadInvoice(orderIds,orderId)
+    const result = await shiprocketService.downloadInvoice(orderIds, orderId)
 
     res.status(200).json(new ApiResponse(200, result, "Invoices generated successfully"))
 }))
@@ -127,13 +127,13 @@ router.get('/shipment/:shipmentId', verifyJwt, asyncHandler(async (req, res) => 
 
 // Create return order
 router.post('/return-order', verifyJwt, asyncHandler(async (req, res) => {
-    const {id: orderId,returnOrderData, reason} = req.body
+    const { id: orderId, returnOrderData, reason } = req.body
 
     if (!returnData.orderId || !returnData.pickupCustomerName || !returnData.items) {
         throw new ApiError(400, "Order ID, pickup customer name, and items are required")
     }
 
-    const result = await shiprocketService.generateReturnOrder(orderId,returnOrderData, reason)
+    const result = await shiprocketService.generateReturnOrder(orderId, returnOrderData, reason)
 
     res.status(201).json(new ApiResponse(201, result, "Return order created successfully"))
 }))

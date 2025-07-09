@@ -11,7 +11,7 @@ router.route("/").get(verifyJwt,getAllOrdr)
 router.patch("/payment",verifyJwt,updatePaymentStatus)
 router.patch("/delivery",verifyJwt,updateDeliveryStatus)
 
-router.route('/customer-address').get(verifyJwt,getCustomerAddressById)
+router.route('/customer-address/:id').get(verifyJwt,getCustomerAddressById)
 
 router.route("/:id").get(verifyJwt,getOrdrById)
 

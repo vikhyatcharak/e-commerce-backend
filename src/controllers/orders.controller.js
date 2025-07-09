@@ -53,6 +53,7 @@ const getOrdrById = asyncHandler(async (req, res) => {
 
     const order = await getOrderById(orderId)
     if (!order) throw new ApiError(404, "Order not found")
+    if(order.delivery_status === "cancelled") throw new ApiError(402, "Order Cancelled")
 
     return res.status(200)
         .json(new ApiResponse(200, order, "Order details retrieved successfully"))

@@ -53,6 +53,9 @@ app.use("/api/customer", customerRouter)
 app.get("/api/admin/health", (req, res) => {
     res.status(200).json(new ApiResponse(200, [], "Server is running"))
 })
+app.get("/api/customer/health", (req, res) => {
+    res.status(200).json(new ApiResponse(200, [], "Server is running"))
+})
 app.get("/api/admin/health/shiprocket", async (req, res) => {
     try {
         const tokenInfo = await shiprocketAuth.getTokenInfo()

@@ -26,7 +26,7 @@ export const deleteSubcategory = async (id) => {
 }
 
 export const getAllSubcategories = async()=>{
-    const [rows]= await db().query(`SELECT * FROM subcategories WHERE ORDER BY created_at DESC`)
+    const [rows]= await db().query(`SELECT * FROM subcategories ORDER BY created_at DESC`)
     return rows
 }
 

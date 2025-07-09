@@ -2,13 +2,11 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
-import { createOrder, getOrderById, getOrdersByUserId } from "../models/orders.model.js"
-import { addOrderItem } from "../models/orderItems.model.js"
+import { createOrder, getOrderById, getOrdersByUserId, updateOrderShippingDetails } from "../models/orders.model.js"
+import { addOrderItem, getItemsByOrderId } from "../models/orderItems.model.js"
 import { getCartByUserId, clearCart, validateCartStock } from "../models/cart.model.js"
 import { getDefaultAddress, getAddressById } from "../models/customerAddress.model.js"
 import shiprocketService from '../services/shiprocketService.js'
-import { updateOrderShippingDetails } from "../models/orders.model.js"
-
 // Create order from cart
 const createCustomerOrder = asyncHandler(async (req, res) => {
     const {
@@ -173,7 +171,7 @@ const trackCustomerOrder = asyncHandler(async (req, res) => {
     }
 
     if (!order.shiprocket_order_id) {
-        throw new ApiError(400, "Tracking not available for this order")
+        throw new ApiError(400, "Tracking not available for this order, shipping in progress")
     }
 
     try {
@@ -195,7 +193,6 @@ const trackCustomerOrder = asyncHandler(async (req, res) => {
 // Cancel order (if allowed)
 const cancelCustomerOrder = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const { reason } = req.body
     const user_id = req.customer.id
 
     const order = await getOrderById(id)
@@ -213,7 +210,9 @@ const cancelCustomerOrder = asyncHandler(async (req, res) => {
     try {
         // Cancel in Shiprocket if exists
         if (order.shiprocket_order_id) {
-            await shiprocketService.cancelShipment(order.shiprocket_order_id)
+            await shiprocketService.cancelShipment(id, order.shiprocket_order_id)
+        } else{
+            await updateOrderShippingDetails(id,{delivery_status: "cancelled"})
         }
 
         const updatedOrder = await getOrderById(id)

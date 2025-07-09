@@ -36,6 +36,7 @@ export const getCartByUserId = async (user_id) => {
             pv.variant_name,
             pv.price,
             pv.stock,
+            pv.description as variant_description,
             p.name as product_name,
             p.description as product_description,
             cat.name as category_name,

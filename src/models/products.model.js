@@ -16,7 +16,7 @@ export const getProductById = async (id) => {
 
 
 export const getAllProducts = async () => {
-  const [rows] = await db().query('SELECT * FROM products WHERE ORDER BY created_at DESC')
+  const [rows] = await db().query('SELECT * FROM products ORDER BY created_at DESC')
   return rows
 }
 

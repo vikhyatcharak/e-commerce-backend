@@ -98,38 +98,41 @@ class ShiprocketService {
                 }
             }
             const shiprocketOrder = {
-                order_id: orderData.orderId,
+                order_id: Number(orderData.orderId),
                 order_date: orderData.orderDate,
                 pickup_location: pickupLocation,
                 billing_customer_name: orderData.customerName,
                 billing_last_name: orderData.customerLastName || '',
                 billing_address: orderData.billingAddress,
+                billing_address_2: orderData.billingAddress2 || '',
                 billing_city: orderData.billingCity,
-                billing_pincode: orderData.billingPincode,
+                billing_pincode: Number(orderData.billingPincode),
                 billing_state: orderData.billingState,
                 billing_country: orderData.billingCountry,
                 billing_email: orderData.email,
-                billing_phone: orderData.phone,
-                shipping_is_billing: orderData.shippingIsBilling || true,
+                billing_phone: orderData.phone?.toString(),
+                billing_alternate_phone: orderData.billingAlternatePhone || '',
+                shipping_is_billing: orderData.shippingIsBilling ?? true,
+                // latitude: parseFloat(orderData.latitude),
+                // longitude: parseFloat(orderData.longitude),
                 order_items: orderData.items.map(item => ({
-                    name: item.name,
+                    name: item.product_name,
                     sku: item.sku,
-                    units: item.quantity,
-                    selling_price: item.price,
-                    discount: item.discount || 0,
-                    tax: item.tax || 0,
-                    hsn: item.hsn || ''
+                    units: Number(item.quantity),
+                    selling_price: Number(item.price),
+                    tax: parseFloat(item.tax || 0),
+                    hsn: item.hsn
                 })),
                 payment_method: orderData.paymentMethod,
-                sub_total: orderData.subTotal,
+                sub_total: Number(orderData.subTotal),
                 length: orderData.dimensions?.length || 10,
                 breadth: orderData.dimensions?.breadth || 10,
                 height: orderData.dimensions?.height || 10,
-                weight: orderData.weight
+                weight: Number(orderData.weight || 1),
+                // shipping_method: orderData.shipping_method || 'SR_STANDARD'
             }
-
             const response = await this.makeRequest('post', 'orders/create/adhoc', shiprocketOrder)
-            await updateOrderShippingDetails(orderData.orderId, { shiprocket_order_id: orderData.orderId, shipment_id: response.shipmentId })
+            await updateOrderShippingDetails(orderData.orderId, { shiprocket_order_id: response.order_id, shipment_id: response.shipment_id, pickup_location_id:orderData.pickupLocationId })
             return {
                 success: true,
                 shiprocketOrderId: response.order_id,
@@ -190,12 +193,12 @@ class ShiprocketService {
         }
     }
 
-    async cancelShipment(orderIds) {
+    async cancelShipment(id, orderIds) {
         try {
             const response = await this.makeRequest('post', 'orders/cancel', {
                 ids: Array.isArray(orderIds) ? orderIds : [orderIds]
             })
-
+            await updateOrderShippingDetails(id, { delivery_status: "cancelled" })
             return {
                 success: true,
                 data: response

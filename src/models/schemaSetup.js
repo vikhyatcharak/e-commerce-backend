@@ -141,6 +141,7 @@ export const initializeTables = async () => {
         payment_mode VARCHAR(50),
         payment_status VARCHAR(50),
         delivery_status VARCHAR(50),
+        pickup_location_id INT,
         shiprocket_order_id VARCHAR(100),
         shipment_id VARCHAR(100),
         awb_code VARCHAR(100),
