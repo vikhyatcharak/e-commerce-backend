@@ -32,7 +32,6 @@ router.post('/create-order', verifyJwt, asyncHandler(async (req, res) => {
 // Assign courier
 router.post('/assign-courier', verifyJwt, asyncHandler(async (req, res) => {
     const orderData = req.body
-    console.log(orderData)
     if (!orderData.shipmentId || !orderData.courierId) throw new ApiError(400, "Shipment ID and courier ID are required")
 
     const result = await shiprocketService.assignCourier(orderData)
@@ -64,7 +63,7 @@ router.get('/track', verifyJwt, asyncHandler(async (req, res) => {
 
 // Cancel shipment
 router.post('/cancel-shipment', verifyJwt, asyncHandler(async (req, res) => {
-    const { orderIds } = req.body
+    const  orderIds  = req.body
 
     if (!orderIds || (Array.isArray(orderIds) && orderIds.length === 0)) throw new ApiError(400, "Order IDs are required")
 

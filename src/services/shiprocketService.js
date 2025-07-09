@@ -27,7 +27,6 @@ class ShiprocketService {
                     config.data = data
                 }
             }
-            console.log(config)
             const response = await axios(config)
             return response.data
         } catch (error) {
@@ -151,7 +150,7 @@ class ShiprocketService {
                 courier_id: orderData.courierId
             })
             const data = response.response?.data
-            await updateOrderShippingDetails(orderData.orderId, { awb_code: orderData.awb_code, courier_company_id: orderData.courier_company_id, courier_name: orderData.courier_name, shipping_cost: orderData.shipping_cost, estimated_delivery_days: orderData.estimated_delivery_days, })
+            await updateOrderShippingDetails(orderData.orderId, { awb_code: data.awb_code, courier_company_id: orderData.courierId, courier_name: orderData.courier_name, shipping_cost: orderData.shipping_cost, estimated_delivery_days: orderData.estimated_delivery_days, })
             return {
                 success: true,
                 awbCode: data.awb_code,
