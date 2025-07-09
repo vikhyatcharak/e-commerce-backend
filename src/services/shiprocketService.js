@@ -280,7 +280,6 @@ class ShiprocketService {
             const returnOrder = {
                 order_id: returnData.orderId,
                 order_date: returnData.orderDate || new Date().toISOString(),
-                channel_id: returnData.channelId || '',
                 pickup_customer_name: returnData.pickupCustomerName,
                 pickup_last_name: returnData.pickupLastName || '',
                 pickup_address: returnData.pickupAddress,
@@ -357,48 +356,49 @@ class ShiprocketService {
         }
     }
 
-    async deletePickupLocation(locationName) {
-        try {
-            const response = await this.makeRequest('post', 'settings/company/removepickup', {
-                pickup_location: locationName
-            })
+    // async deletePickupLocation(locationName) {
+    //     try {
+    //         const response = await this.makeRequest('post', 'settings/company/removepickup', {
+    //             pickup_location: locationName
+    //         })
 
-            return {
-                success: true,
-                message: response.message || 'Pickup location deleted successfully',
-                data: response
-            }
-        } catch (error) {
-            throw new Error(`Pickup location deletion failed: ${error.response?.data?.message || error.message}`)
-        }
-    }
+    //         return {
+    //             success: true,
+    //             message: response.message || 'Pickup location deleted successfully',
+    //             data: response
+    //         }
+    //     } catch (error) {
+    //         throw new Error(`Pickup location deletion failed: ${error.response?.data?.message || error.message}`)
+    //     }
+    // }
 
-    async updatePickupLocation(locationName, updatedData) {
-        try {
-            const payload = {
-                pickup_location: locationName,
-                name: updatedData.contact_person,
-                email: updatedData.email,
-                phone: updatedData.phone,
-                address: updatedData.address,
-                address_2: updatedData.address2 || '',
-                city: updatedData.city,
-                state: updatedData.state,
-                country: updatedData.country || 'India',
-                pin_code: updatedData.pincode
-            }
+    // async updatePickupLocation(locationName, updatedData) {
+    //     try {
+    //         const payload = {
+    //             pickup_location: locationName,
+    //             name: updatedData.contact_person,
+    //             email: updatedData.email,
+    //             phone: updatedData.phone,
+    //             address: updatedData.address,
+    //             address_2: updatedData.address2 || '',
+    //             city: updatedData.city,
+    //             state: updatedData.state,
+    //             country: updatedData.country || 'India',
+    //             pin_code: updatedData.pincode
+    //         }
 
-            const response = await this.makeRequest('post', 'settings/company/updatepickup', payload)
+    //         const response = await this.makeRequest('post', 'settings/company/updatepickup', payload)
 
-            return {
-                success: true,
-                message: response.message || 'Pickup location updated successfully',
-                data: response
-            }
-        } catch (error) {
-            throw new Error(`Pickup location update failed: ${error.response?.data?.message || error.message}`)
-        }
-    }
+    //         return {
+    //             success: true,
+    //             message: response.message || 'Pickup location updated successfully',
+    //             data: response
+    //         }
+    //     } catch (error) {
+    //         throw new Error(`Pickup location update failed: ${error.response?.data?.message || error.message}`)
+    //     }
+    // }
+    //cannot edit or delete in shiprocket
 
 
 

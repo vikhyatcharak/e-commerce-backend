@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { verifyJwt } from "../middlewares/auth.middleware.js"
-import {createPickupLoc,getAllPickupLoc,getPickupLocById,getDefaultPickupLoc,updatePickupLoc,deletePickupLoc,setDefaultPickupLoc,getPickupLocByCity,getPickupLocByState} from "../controllers/pickupLocation.controller.js"
+import {createPickupLoc,getAllPickupLoc,getPickupLocById,getDefaultPickupLoc,/*updatePickupLoc,deletePickupLoc,*/setDefaultPickupLoc,getPickupLocByCity,getPickupLocByState} from "../controllers/pickupLocation.controller.js"
 
 const router = Router()
 
@@ -17,8 +17,9 @@ router.get("/state/:state", getPickupLocByState)
 
 router.route("/:id")
     .get(getPickupLocById)
-    .patch(updatePickupLoc)
-    .delete(deletePickupLoc)
+    // .patch(updatePickupLoc)
+    // .delete(deletePickupLoc)
+    //cannot edit or delete in shiprocket
 
 router.patch("/:id/set-default", setDefaultPickupLoc)
 

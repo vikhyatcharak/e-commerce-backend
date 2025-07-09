@@ -2,7 +2,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { ApiError } from "../utils/ApiError.js"
-import { createPickupLocation, getAllPickupLocations, getPickupLocationById, getDefaultPickupLocation, updatePickupLocation, deletePickupLocation, setDefaultPickupLocation, getPickupLocationByCity, getPickupLocationsByState } from "../models/pickupLocations.model.js"
+import { createPickupLocation, getAllPickupLocations, getPickupLocationById, getDefaultPickupLocation, /* setDefaultPickupLocation, getPickupLocationByCity,*/ getPickupLocationsByState, setDefaultPickupLocation } from "../models/pickupLocations.model.js"
 import shiprocketService from "../services/shiprocketService.js"
 
 // Create pickup location (Admin only)
@@ -10,7 +10,13 @@ const createPickupLoc = asyncHandler(async (req, res) => {
     const { location_name, address, city, state, country, pincode, contact_person, phone, email, is_default } = req.body
 
     if (!location_name?.trim()) throw new ApiError(400, "Location name is required")
-    if (!address?.trim()) throw new ApiError(400, "Address is required")
+    if (!address?.trim()) {
+        throw new ApiError(400, "Address is required")
+    } else if (address.length < 10) {
+        throw new ApiError('Address must be at least 10 characters long')
+    } else if (!/(house|flat|road|street|block|no\.?|#)/i.test(address.trim())) {
+        throw new ApiError('Address line 1 should have House no / Flat no / Road no.')
+    }
     if (!city?.trim()) throw new ApiError(400, "City is required")
     if (!state?.trim()) throw new ApiError(400, "State is required")
     if (!country?.trim()) throw new ApiError(400, "Country is required")
@@ -21,20 +27,20 @@ const createPickupLoc = asyncHandler(async (req, res) => {
     const locationData = {
         location_name: location_name.trim(),
         address: address.trim(),
-        city: city.trim(),
-        state: state.trim(),
-        country:country.trim(),
         pincode: pincode.trim(),
-        contact_person:contact_person.trim(),
+        contact_person: contact_person.trim(),
         phone: phone?.trim() || null,
-        email:email?.trim(),
+        email: email?.trim(),
         is_default: is_default || false
     }
+    locationData.city = city.trim().charAt(0).toUpperCase() + city.trim().slice(1)
+    locationData.state = state.trim().charAt(0).toUpperCase() + state.trim().slice(1)
+    locationData.country = country.trim().charAt(0).toUpperCase() + country.trim().slice(1)
     await shiprocketService.createPickupLocation(locationData)
-    
+
     const locationId = await createPickupLocation(locationData)
     if (!locationId) throw new ApiError(500, "Failed to create pickup location")
-    
+
 
     const newLocation = await getPickupLocationById(locationId)
     return res.status(201)
@@ -70,10 +76,10 @@ const getDefaultPickupLoc = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, location, "Default pickup location retrieved successfully"))
 })
 
-// Update pickup location (Admin only)
-const updatePickupLoc = asyncHandler(async (req, res) => {
+// Update pickup location cannot in shiprocket
+/*const updatePickupLoc = asyncHandler(async (req, res) => {
     const { id } = req.params
-    const { location_name, address, city, state, country, pincode, phone,contact_person, is_default } = req.body
+    const { address, city, state, country, pincode, phone, email, contact_person, is_default } = req.body
 
     if (!id) throw new ApiError(400, "Location ID is required")
 
@@ -81,11 +87,17 @@ const updatePickupLoc = asyncHandler(async (req, res) => {
     if (!existingLocation) throw new ApiError(404, "Pickup location not found")
 
     const updateData = {}
-    if (location_name?.trim()) updateData.location_name = location_name.trim()
-    if (address?.trim()) updateData.address = address.trim()
-    if (city?.trim()) updateData.city = city.trim()
-    if (state?.trim()) updateData.state = state.trim()
-    if (country?.trim()) updateData.country = country.trim()
+    if (address?.trim()) {
+        if (address.length < 10) {
+            throw new ApiError('Address must be at least 10 characters long')
+        } else if (!/(house|flat|road|street|block|no\.?|#)/i.test(address.trim())) {
+            throw new ApiError('Address line 1 should have House no / Flat no / Road no.')
+        }
+        updateData.address = address.trim()
+    }
+    if (city?.trim()) updateData.city = city.trim().charAt(0).toUpperCase() + city.trim().slice(1)
+    if (state?.trim()) updateData.state = state.trim().charAt(0).toUpperCase() + state.trim().slice(1)
+    if (country?.trim()) updateData.country = country.trim().charAt(0).toUpperCase() + state.trim().slice(1)
     if (pincode?.trim()) updateData.pincode = pincode.trim()
     if (phone?.trim()) updateData.phone = phone.trim()
     if (email?.trim()) updateData.email = email.trim()
@@ -95,8 +107,8 @@ const updatePickupLoc = asyncHandler(async (req, res) => {
     if (Object.keys(updateData).length === 0) {
         throw new ApiError(400, "No update data provided")
     }
-    
-    await shiprocketService.updatePickupLocation(location_name?.trim(),{updateData})
+
+    await shiprocketService.updatePickupLocation(existingLocation.location_name, { updateData })
 
     const affectedRows = await updatePickupLocation(id, updateData)
     if (!affectedRows) throw new ApiError(500, "Failed to update pickup location")
@@ -105,17 +117,17 @@ const updatePickupLoc = asyncHandler(async (req, res) => {
     const updatedLocation = await getPickupLocationById(id)
     return res.status(200)
         .json(new ApiResponse(200, updatedLocation, "Pickup location updated successfully"))
-})
+})*/
 
-// Delete pickup location (Admin only)
-const deletePickupLoc = asyncHandler(async (req, res) => {
+// Delete pickup location cannot in shiprocket
+/*const deletePickupLoc = asyncHandler(async (req, res) => {
     const { id } = req.params
 
     if (!id) throw new ApiError(400, "Location ID is required")
 
     const location = await getPickupLocationById(id)
     if (!location) throw new ApiError(404, "Pickup location not found")
-    
+
     await shiprocketService.deletePickupLocation(location.location_name)
 
     const affectedRows = await deletePickupLocation(id)
@@ -123,9 +135,9 @@ const deletePickupLoc = asyncHandler(async (req, res) => {
 
     return res.status(200)
         .json(new ApiResponse(200, { deleted: true }, "Pickup location deleted successfully"))
-})
+})*/
 
-// Set default pickup location (Admin only)
+// Set default pickup location 
 const setDefaultPickupLoc = asyncHandler(async (req, res) => {
     const { id } = req.params
 
@@ -169,8 +181,6 @@ export {
     getAllPickupLoc,
     getPickupLocById,
     getDefaultPickupLoc,
-    updatePickupLoc,
-    deletePickupLoc,
     setDefaultPickupLoc,
     getPickupLocByCity,
     getPickupLocByState

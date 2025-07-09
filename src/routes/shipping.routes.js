@@ -126,13 +126,13 @@ router.get('/shipment/:shipmentId', verifyJwt, asyncHandler(async (req, res) => 
 
 // Create return order
 router.post('/return-order', verifyJwt, asyncHandler(async (req, res) => {
-    const { id: orderId, returnOrderData, reason } = req.body
+    const { id: orderId, returnData, reason } = req.body
 
     if (!returnData.orderId || !returnData.pickupCustomerName || !returnData.items) {
         throw new ApiError(400, "Order ID, pickup customer name, and items are required")
     }
 
-    const result = await shiprocketService.generateReturnOrder(orderId, returnOrderData, reason)
+    const result = await shiprocketService.generateReturnOrder(orderId, returnData, reason)
 
     res.status(201).json(new ApiResponse(201, result, "Return order created successfully"))
 }))
