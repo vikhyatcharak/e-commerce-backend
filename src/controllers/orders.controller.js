@@ -65,7 +65,6 @@ const getOrdrByUserId = asyncHandler(async (req, res) => {
 
     const userId = Number(rawId)
     if (!userId || isNaN(userId)) throw new ApiError(400, "Invalid user ID")
-    console.log(userId)
     const orders = await getOrdersByUserId(userId)
     return res.status(200)
         .json(new ApiResponse(200, orders, "User orders retrieved successfully"))
