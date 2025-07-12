@@ -3,46 +3,21 @@ import { Router } from "express"
 import { verifyCustomerJwt } from "../middlewares/auth.middleware.js"
 
 // Import controllers
-import {
-    sendCustomerOtp,
-    verifyCustomerOtp,
-    registerCustomer,
-    loginCustomer,
-    logoutCustomer,
-    refreshAccessToken,
-    getCurrentCustomer,
-    updateCustomerProfile,
-    changePassword
-} from "../controllers/customer.controller.js"
+import {sendCustomerOtp,verifyCustomerOtp,registerCustomer,loginCustomer,logoutCustomer,refreshAccessToken,getCurrentCustomer,updateCustomerProfile,changePassword} from "../controllers/customer.controller.js"
 
-import {
-    createCustomerAddress,
-    getCustomerAddresses,
-    getCustomerAddressById,
-    updateCustomerAddress,
-    deleteCustomerAddress,
-    getCustomerDefaultAddress,
-    setCustomerDefaultAddress
-} from "../controllers/customerAddress.controller.js"
+import {createCustomerAddress,getCustomerAddresses,getCustomerAddressById,updateCustomerAddress,deleteCustomerAddress,getCustomerDefaultAddress,setCustomerDefaultAddress} from "../controllers/customerAddress.controller.js"
 
-import {
-    addItemToCart,
-    getCustomerCart,
-    updateCartItemQuantity,
-    removeItemFromCart,
-    clearCustomerCart,
-    getCustomerCartCount,
-    getCustomerCartSummary,
-    validateCustomerCartStock
-} from "../controllers/customerCart.controller.js"
+import {addItemToCart,getCustomerCart,updateCartItemQuantity,removeItemFromCart,clearCustomerCart,getCustomerCartCount,getCustomerCartSummary,validateCustomerCartStock} from "../controllers/customerCart.controller.js"
 
-import {
-    createCustomerOrder,
-    getCustomerOrders,
-    getCustomerOrderById,
-    trackCustomerOrder,
-    cancelCustomerOrder
-} from "../controllers/customerOrder.controller.js"
+import {createCustomerOrder,getCustomerOrders,getCustomerOrderById,trackCustomerOrder,cancelCustomerOrder} from "../controllers/customerOrder.controller.js"
+
+import { getAllProd, getPaginatedProd, getProdByCategory, getProdById, getProdBySubcategory } from "../controllers/products.controller.js"
+
+import { getVariantsByProduct } from "../controllers/productVariants.controller.js"
+
+import { getAllCat, getCatById, getPaginatedCat } from "../controllers/categories.controller.js"
+
+import { getAllSubcat, getPaginatedSubcat } from "../controllers/subcategories.controller.js"
 
 const router = Router()
 
@@ -69,12 +44,13 @@ router.route("/addresses")
 
 router.get("/addresses/default", getCustomerDefaultAddress)
 
+router.patch("/addresses/set-default/:id", setCustomerDefaultAddress)
+
 router.route("/addresses/:id")
     .get(getCustomerAddressById)
     .patch(updateCustomerAddress)
     .delete(deleteCustomerAddress)
 
-router.patch("/addresses/:id/set-default", setCustomerDefaultAddress)
 
 // Cart routes
 router.route("/cart")
@@ -93,8 +69,34 @@ router.route("/orders")
     .get(getCustomerOrders)
     .post(createCustomerOrder)
 
+router.get("/orders/track/:id", trackCustomerOrder)
+router.post("/orders/cancel/:id", cancelCustomerOrder)
 router.get("/orders/:id", getCustomerOrderById)
-router.get("/orders/:id/track", trackCustomerOrder)
-router.post("/orders/:id/cancel", cancelCustomerOrder)
+
+//get routes
+//products
+router.route("/products").get(getAllProd)
+router.route('/products/paginated').get(getPaginatedProd)
+router.route("/products/variant/:product_id").get(getVariantsByProduct)
+router.route("/products/:id").get(getProdById)
+//categories
+router.route("/categories").get(getAllCat)
+router.route("/categories/category").get(getCatById)//query
+router.route("/categories/paginated").get(getPaginatedCat)
+router.route("/categories/subcategories/:category_id").get(verifyJwt, getAllSubcatByCategoryId)
+router.route("/categories/products/:category_id").get(getProdByCategory)
+//subcategories
+router.route("/subcategories").get(getAllSubcat)
+router.route("/subcategories/paginated").get(getPaginatedSubcat)
+router.route("/subcategories/products/:subcategory_id").get(getProdBySubcategory)
+
+
+
+
+
+
+
+
+
 
 export default router
