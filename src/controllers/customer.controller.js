@@ -104,6 +104,7 @@ const registerCustomer = asyncHandler(async (req, res) => {
     if (!email?.trim()) throw new ApiError(400, "Email is required")
     if (!phone?.trim()) throw new ApiError(400, "Phone is required")
     if (!password?.trim()) throw new ApiError(400, "Password is required")
+    if (!gender?.trim()) throw new ApiError(400, "Gender is required")
 
     // Check if user exists
     const existingUserByEmail = await getUserByEmail(email?.trim())
@@ -121,7 +122,7 @@ const registerCustomer = asyncHandler(async (req, res) => {
         phone: phone.trim(),
         password: hashedPassword,
         dob: dob || null,
-        gender: gender || null,
+        gender: gender,
         is_guest: false
     }
 

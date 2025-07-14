@@ -37,7 +37,7 @@ const getVariantsByProduct = asyncHandler(async (req, res) => {
 
     const variants = await getProductVariantsByProductId(productId)
     return res.status(200)
-        .json(new ApiResponse(200, variants, "Product variants retrieved successfully"))
+        .json(new ApiResponse(200, {variants}, "Product variants retrieved successfully"))
 })
 
 const getVariant = asyncHandler(async (req, res) => {

@@ -17,7 +17,7 @@ import { getVariantsByProduct } from "../controllers/productVariants.controller.
 
 import { getAllCat, getCatById, getPaginatedCat } from "../controllers/categories.controller.js"
 
-import { getAllSubcat, getPaginatedSubcat } from "../controllers/subcategories.controller.js"
+import { getAllSubcat, getAllSubcatByCategoryId, getPaginatedSubcat } from "../controllers/subcategories.controller.js"
 
 const router = Router()
 
@@ -83,7 +83,7 @@ router.route("/products/:id").get(getProdById)
 router.route("/categories").get(getAllCat)
 router.route("/categories/category").get(getCatById)//query
 router.route("/categories/paginated").get(getPaginatedCat)
-router.route("/categories/subcategories/:category_id").get(verifyJwt, getAllSubcatByCategoryId)
+router.route("/categories/subcategories/:category_id").get(getAllSubcatByCategoryId)
 router.route("/categories/products/:category_id").get(getProdByCategory)
 //subcategories
 router.route("/subcategories").get(getAllSubcat)
